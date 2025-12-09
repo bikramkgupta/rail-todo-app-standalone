@@ -3,7 +3,7 @@
 Standalone Ruby on Rails to-do list application with Bootstrap UI, ready for hot-reload development on DigitalOcean App Platform using the `hot-reload-template` Dockerfile.
 
 ## Features
-- Rails 8.1.x on Ruby 3.4
+- Rails 8.1.x on Ruby 3.4.7
 - CRUD tasks (title, description, completed)
 - Bootstrap 5 responsive layout
 - SQLite for development, PostgreSQL-ready for production
