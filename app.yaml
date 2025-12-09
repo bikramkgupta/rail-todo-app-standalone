@@ -1,0 +1,116 @@
+#
+# Rail Todo App - DigitalOcean App Platform spec (hot-reload)
+# Uses the hot-reload-template Dockerfile from the template repository.
+#
+
+name: rail-todo-dev
+region: nyc
+
+services:
+  - name: rails-app
+    # Build container from the hot-reload-template repo
+    dockerfile_path: hot-reload-template/Dockerfile
+
+    github:
+      repo: bikram20/do-app-platform-ai-dev-workflow  # template repo providing Dockerfile + scripts
+      branch: main
+      deploy_on_push: true
+
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-2gb  # 2GB recommended for Rails
+
+    http_port: 8080
+    internal_ports:
+      - 9090
+
+    health_check:
+      http_path: /dev_health
+      port: 9090
+      initial_delay_seconds: 60
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 5
+
+    build_args:
+      - key: INSTALL_NODE
+        value: "false"
+      - key: INSTALL_PYTHON
+        value: "false"
+      - key: INSTALL_GOLANG
+        value: "false"
+      - key: INSTALL_RUST
+        value: "false"
+      - key: INSTALL_RUBY
+        value: "true"
+      - key: RUBY_VERSIONS
+        value: "3.4 3.3"
+      - key: DEFAULT_RUBY
+        value: "3.4"
+      - key: INSTALL_POSTGRES
+        value: "true"
+      - key: INSTALL_MONGODB
+        value: "false"
+      - key: INSTALL_MYSQL
+        value: "false"
+
+    envs:
+      # === Your Rails application repository (this repo) ===
+      - key: GITHUB_REPO_URL
+        value: "https://github.com/bikram20/rail-todo-app"
+        scope: RUN_TIME
+
+      # === GitHub auth (private repos) ===
+      - key: GITHUB_TOKEN
+        value: ""
+        scope: RUN_TIME
+        type: SECRET
+
+      # === Startup command ===
+      - key: DEV_START_COMMAND
+        value: "bash dev_startup.sh"
+        scope: RUN_TIME
+
+      # === Workspace / sync settings ===
+      - key: WORKSPACE_PATH
+        value: "/workspaces/app"
+        scope: RUN_TIME
+      - key: GITHUB_SYNC_INTERVAL
+        value: "30"
+        scope: RUN_TIME
+      - key: GITHUB_BRANCH
+        value: "main"
+        scope: RUN_TIME
+      - key: GITHUB_REPO_FOLDER
+        value: ""
+        scope: RUN_TIME
+
+      # === Rails runtime ===
+      - key: RAILS_ENV
+        value: "development"
+        scope: RUN_TIME
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+        scope: RUN_TIME
+
+      # === Dev health server (turn off after your app exposes health) ===
+      - key: ENABLE_DEV_HEALTH
+        value: "true"
+        scope: RUN_TIME
+      - key: DEV_HEALTH_PORT
+        value: "9090"
+        scope: RUN_TIME
+
+# Optional: add a managed Postgres database for production and set DATABASE_URL
+# databases:
+#   - name: rails-db
+#     engine: PG
+#     production: false
+#     version: "16"
+#
+# Then add to envs:
+#   - key: DATABASE_URL
+#     value: ${rails-db.DATABASE_URL}
+#     scope: RUN_TIME
+#     type: SECRET
+

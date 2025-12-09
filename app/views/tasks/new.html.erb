@@ -1,0 +1,17 @@
+<% content_for :title, "New Task" %>
+
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0"><i class="bi bi-plus-circle"></i> New Task</h3>
+      </div>
+      <div class="card-body">
+        <%= render "form", task: @task %>
+      </div>
+      <div class="card-footer">
+        <%= link_to "Back to tasks", tasks_path, class: "btn btn-outline-secondary" %>
+      </div>
+    </div>
+  </div>
+</div>
