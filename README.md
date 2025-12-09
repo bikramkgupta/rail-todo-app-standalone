@@ -20,7 +20,7 @@ bin/rails s -b 0.0.0.0 -p 3000
 This repo is deployed using the `hot-reload-template` Dockerfile (from the template repo) plus the `dev_startup.sh` in this repo. The App Platform spec is in `app.yaml`.
 
 Key environment variables (set in App Platform UI or spec):
-- `GITHUB_REPO_URL`: `https://github.com/bikram20/rail-todo-app`
+- `GITHUB_REPO_URL`: `https://github.com/bikramkgupta/rail-todo-app-standalone`
 - `GITHUB_BRANCH`: `main`
 - `DEV_START_COMMAND`: `bash dev_startup.sh`
 - `ENABLE_DEV_HEALTH`: `true` initially; switch to `false` after your app health endpoint is ready
