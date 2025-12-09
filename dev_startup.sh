@@ -30,23 +30,85 @@ if ! command -v rbenv >/dev/null 2>&1; then
 fi
 
 if command -v rbenv >/dev/null 2>&1; then
-    # Initialize rbenv and ensure the expected Ruby is installed for this user
-    eval "$(rbenv init - bash)"
-    # If a mismatched/root-owned Ruby exists, remove it and reinstall cleanly
-    if ! [ -x "$RBENV_ROOT/versions/3.4.7/bin/ruby" ]; then
-        echo "🔧 Installing Ruby 3.4.7 for devcontainer user..."
-        rbenv install -s 3.4.7
-    else
-        # Validate that the ruby is usable (not pointing to /root)
-        if ! "$RBENV_ROOT/versions/3.4.7/bin/ruby" -v >/dev/null 2>&1; then
-            echo "🔧 Rebuilding Ruby 3.4.7 to fix permissions..."
-            rm -rf "$RBENV_ROOT/versions/3.4.7"
-            rbenv install -s 3.4.7
+    # Initialize rbenv
+    eval "$(rbenv init - bash)" 2>/dev/null || true
+    
+    # Detect required Ruby version from .ruby-version file (if present)
+    REQUIRED_RUBY="3.4.7"
+    if [ -f ".ruby-version" ]; then
+        REQUIRED_RUBY=$(cat .ruby-version | tr -d '[:space:]' | sed 's/^ruby-//')
+        echo "📋 Detected Ruby version requirement: $REQUIRED_RUBY"
+    fi
+    
+    # Check if required Ruby version exists and is usable
+    RUBY_AVAILABLE=false
+    if [ -x "$RBENV_ROOT/versions/$REQUIRED_RUBY/bin/ruby" ]; then
+        # Test if Ruby actually works (not broken paths)
+        if "$RBENV_ROOT/versions/$REQUIRED_RUBY/bin/ruby" -v >/dev/null 2>&1; then
+            RUBY_AVAILABLE=true
+            echo "✓ Ruby $REQUIRED_RUBY is available and working"
+        else
+            echo "⚠️  Ruby $REQUIRED_RUBY exists but has broken paths, will reinstall"
         fi
     fi
-    rbenv global 3.4.7
+    
+    # If required Ruby is not available, check for any working Ruby version
+    if [ "$RUBY_AVAILABLE" = "false" ]; then
+        echo "🔍 Checking for available Ruby versions..."
+        if [ -d "$RBENV_ROOT/versions" ]; then
+            for ruby_dir in "$RBENV_ROOT/versions"/*; do
+                if [ -d "$ruby_dir" ] && [ -x "$ruby_dir/bin/ruby" ]; then
+                    RUBY_VER=$(basename "$ruby_dir")
+                    if "$ruby_dir/bin/ruby" -v >/dev/null 2>&1; then
+                        echo "✓ Found working Ruby version: $RUBY_VER"
+                        REQUIRED_RUBY="$RUBY_VER"
+                        RUBY_AVAILABLE=true
+                        break
+                    fi
+                fi
+            done
+        fi
+    fi
+    
+    # Install Ruby only if not available
+    if [ "$RUBY_AVAILABLE" = "false" ]; then
+        echo "🔧 Installing Ruby $REQUIRED_RUBY for devcontainer user..."
+        echo "   (This may take 2-3 minutes...)"
+        rbenv install -s "$REQUIRED_RUBY" || {
+            echo "⚠️  Failed to install Ruby $REQUIRED_RUBY"
+            echo "   Attempting to use system Ruby or available version..."
+            # Try to use any available version
+            AVAILABLE_VERSION=$(rbenv versions --bare 2>/dev/null | head -1)
+            if [ -n "$AVAILABLE_VERSION" ]; then
+                REQUIRED_RUBY="$AVAILABLE_VERSION"
+                echo "   Using available Ruby version: $REQUIRED_RUBY"
+            else
+                echo "❌ No Ruby version available. Please check installation."
+                exit 1
+            fi
+        }
+    fi
+    
+    # Set Ruby version
+    rbenv global "$REQUIRED_RUBY"
+    rbenv local "$REQUIRED_RUBY" 2>/dev/null || true
+    
+    # Verify Ruby works
+    if ! ruby -v >/dev/null 2>&1; then
+        echo "❌ Ruby is not working. Please check installation."
+        exit 1
+    fi
+    
+    echo "✓ Using Ruby $(ruby -v | awk '{print $2}')"
+    
     # Ensure bundler is present for this Ruby
-    gem install -N bundler -v 2.5.17 --force >/dev/null 2>&1 || true
+    if ! bundle --version >/dev/null 2>&1; then
+        echo "📦 Installing bundler..."
+        gem install -N bundler -v 2.5.17 --force >/dev/null 2>&1 || true
+    fi
+else
+    echo "❌ rbenv not found. Cannot proceed with Ruby setup."
+    exit 1
 fi
 
 # Detect and remove Gemfile.lock merge conflicts (from git sync)
