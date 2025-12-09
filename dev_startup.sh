@@ -16,6 +16,19 @@ echo "=========================================="
 # Ensure rbenv is initialized for the devcontainer user (avoid root-owned shims)
 export RBENV_ROOT="${RBENV_ROOT:-/home/devcontainer/.rbenv}"
 export PATH="$RBENV_ROOT/bin:$RBENV_ROOT/shims:$PATH"
+
+# Install rbenv/ruby-build at runtime if missing (handles images built without Ruby)
+if ! command -v rbenv >/dev/null 2>&1; then
+    echo "🔧 Installing rbenv for devcontainer user..."
+    sudo apt-get update -y >/dev/null 2>&1
+    sudo apt-get install -y --no-install-recommends \
+        libreadline-dev libyaml-dev libz-dev libffi-dev libssl-dev build-essential git >/dev/null 2>&1
+    git clone https://github.com/rbenv/rbenv.git "$RBENV_ROOT"
+    git clone https://github.com/rbenv/ruby-build.git "$RBENV_ROOT/plugins/ruby-build"
+    cd "$RBENV_ROOT" && src/configure && make -C src
+    export PATH="$RBENV_ROOT/bin:$RBENV_ROOT/shims:$PATH"
+fi
+
 if command -v rbenv >/dev/null 2>&1; then
     # Initialize rbenv and ensure the expected Ruby is installed for this user
     eval "$(rbenv init - bash)"
