@@ -57,7 +57,7 @@ services:
     envs:
       # === Your Rails application repository (this repo) ===
       - key: GITHUB_REPO_URL
-        value: "https://github.com/bikramkgupta/rail-todo-app"
+        value: "https://github.com/bikram20/rail-todo-app"
         scope: RUN_TIME
 
       # === GitHub auth (private repos) ===
