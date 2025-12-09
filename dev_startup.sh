@@ -19,13 +19,21 @@ export PATH="$RBENV_ROOT/bin:$RBENV_ROOT/shims:$PATH"
 if command -v rbenv >/dev/null 2>&1; then
     # Initialize rbenv and ensure the expected Ruby is installed for this user
     eval "$(rbenv init - bash)"
-    if ! rbenv versions --bare | grep -q "^3.4.7$"; then
+    # If a mismatched/root-owned Ruby exists, remove it and reinstall cleanly
+    if ! [ -x "$RBENV_ROOT/versions/3.4.7/bin/ruby" ]; then
         echo "🔧 Installing Ruby 3.4.7 for devcontainer user..."
         rbenv install -s 3.4.7
+    else
+        # Validate that the ruby is usable (not pointing to /root)
+        if ! "$RBENV_ROOT/versions/3.4.7/bin/ruby" -v >/dev/null 2>&1; then
+            echo "🔧 Rebuilding Ruby 3.4.7 to fix permissions..."
+            rm -rf "$RBENV_ROOT/versions/3.4.7"
+            rbenv install -s 3.4.7
+        fi
     fi
     rbenv global 3.4.7
     # Ensure bundler is present for this Ruby
-    gem install -N bundler -v 2.5.17 >/dev/null 2>&1 || true
+    gem install -N bundler -v 2.5.17 --force >/dev/null 2>&1 || true
 fi
 
 # Detect and remove Gemfile.lock merge conflicts (from git sync)
