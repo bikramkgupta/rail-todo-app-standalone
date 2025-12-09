@@ -12,7 +12,7 @@ services:
     dockerfile_path: hot-reload-template/Dockerfile
 
     github:
-      repo: bikram20/do-app-platform-ai-dev-workflow  # template repo providing Dockerfile + scripts
+      repo: bikramkgupta/do-app-platform-ai-dev-workflow  # template repo providing Dockerfile + scripts (fork for access)
       branch: main
       deploy_on_push: true
 
