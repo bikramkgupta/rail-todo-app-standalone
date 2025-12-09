@@ -50,7 +50,7 @@ services:
         value: "true"
         scope: BUILD_TIME
       - key: RUBY_VERSIONS
-        value: "3.4.7 3.3.6"
+        value: "3.4.7"
         scope: BUILD_TIME
       - key: DEFAULT_RUBY
         value: "3.4.7"
