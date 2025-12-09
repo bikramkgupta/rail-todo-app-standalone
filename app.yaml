@@ -32,29 +32,39 @@ services:
       success_threshold: 1
       failure_threshold: 5
 
-    build_args:
+    envs:
+      # === Build-time args (Dockerfile build) ===
       - key: INSTALL_NODE
         value: "false"
+        scope: BUILD_TIME
       - key: INSTALL_PYTHON
         value: "false"
+        scope: BUILD_TIME
       - key: INSTALL_GOLANG
         value: "false"
+        scope: BUILD_TIME
       - key: INSTALL_RUST
         value: "false"
+        scope: BUILD_TIME
       - key: INSTALL_RUBY
         value: "true"
+        scope: BUILD_TIME
       - key: RUBY_VERSIONS
         value: "3.4 3.3"
+        scope: BUILD_TIME
       - key: DEFAULT_RUBY
         value: "3.4"
+        scope: BUILD_TIME
       - key: INSTALL_POSTGRES
         value: "true"
+        scope: BUILD_TIME
       - key: INSTALL_MONGODB
         value: "false"
+        scope: BUILD_TIME
       - key: INSTALL_MYSQL
         value: "false"
+        scope: BUILD_TIME
 
-    envs:
       # === Your Rails application repository (this repo) ===
       - key: GITHUB_REPO_URL
         value: "https://github.com/bikramkgupta/rail-todo-app-standalone"
