@@ -1,7 +1,17 @@
 <% content_for :title, "Tasks" %>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h1><i class="bi bi-list-check"></i> My Tasks <span class="badge bg-success">Hot-Reload Active!</span></h1>
+  <div>
+    <h1><i class="bi bi-list-check"></i> My Tasks <span class="badge bg-success">Hot-Reload Active!</span></h1>
+    <% if @tasks.any? %>
+      <p class="text-muted mb-0">
+        Showing <%= @pagy.from %>-<%= @pagy.to %> of <%= @pagy.count %> tasks
+        <% if @pagy.pages > 1 %>
+          (Page <%= @pagy.page %> of <%= @pagy.pages %>)
+        <% end %>
+      </p>
+    <% end %>
+  </div>
   <%= link_to new_task_path, class: "btn btn-primary" do %>
     <i class="bi bi-plus-lg"></i> New Task
   <% end %>
@@ -41,6 +51,11 @@
         </div>
       </div>
     <% end %>
+  </div>
+
+  <%# Pagination controls %>
+  <div class="mt-4 d-flex justify-content-center">
+    <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
   </div>
 <% else %>
   <div class="alert alert-info" role="alert">
