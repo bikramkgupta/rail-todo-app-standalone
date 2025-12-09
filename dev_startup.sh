@@ -13,6 +13,21 @@ echo "=========================================="
 echo "Rails App Startup Script"
 echo "=========================================="
 
+# Ensure rbenv is initialized for the devcontainer user (avoid root-owned shims)
+export RBENV_ROOT="${RBENV_ROOT:-/home/devcontainer/.rbenv}"
+export PATH="$RBENV_ROOT/bin:$RBENV_ROOT/shims:$PATH"
+if command -v rbenv >/dev/null 2>&1; then
+    # Initialize rbenv and ensure the expected Ruby is installed for this user
+    eval "$(rbenv init - bash)"
+    if ! rbenv versions --bare | grep -q "^3.4.7$"; then
+        echo "🔧 Installing Ruby 3.4.7 for devcontainer user..."
+        rbenv install -s 3.4.7
+    fi
+    rbenv global 3.4.7
+    # Ensure bundler is present for this Ruby
+    gem install -N bundler -v 2.5.17 >/dev/null 2>&1 || true
+fi
+
 # Detect and remove Gemfile.lock merge conflicts (from git sync)
 if [ -f "Gemfile.lock" ]; then
     if grep -q "^<<<<<<< " "Gemfile.lock" 2>/dev/null || \
