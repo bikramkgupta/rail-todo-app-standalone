@@ -8,3 +8,20 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+.markdown-body p {
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body pre {
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
+.markdown-body code {
+  font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+  background: #f8f9fa;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.2rem;
+}
