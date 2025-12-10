@@ -1,3 +1,6 @@
+require "kramdown"
+require "kramdown-parser-gfm"
+
 module ApplicationHelper
   # Include Pagy frontend helpers for pagination UI
   include Pagy::Frontend
