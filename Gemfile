@@ -44,6 +44,7 @@ gem "image_processing", "~> 1.2"
 # Fast, lightweight pagination [https://github.com/ddnexus/pagy]
 gem "pagy", "~> 8.0"
 gem "kramdown", "~> 2.4"
+gem "kramdown-parser-gfm", "~> 1.1"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
